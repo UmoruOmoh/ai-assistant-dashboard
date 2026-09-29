@@ -59,16 +59,17 @@ const activities = [
 ];
 
 function App() {
+  const [activePage, setActivePage] = useState("Dashboard");
   const [assistantOpen, setAssistantOpen] = useState(false);
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
 
-  const handleSend = () => {
-    if (!message.trim() || loading) return;
+  const handleSend = (text = message) => {
+    if (!text.trim() || loading) return;
 
-    const userMessage = message.trim();
+    const userMessage = text.trim();
     const lowerMessage = userMessage.toLowerCase();
 
     setMessages((prev) => [
@@ -100,8 +101,8 @@ function App() {
         lowerMessage.includes("pending") ||
         lowerMessage.includes("summarize")
       ) {
-       response =
-  "The dashboard shows 12 pending requests overall. In the recent requests list, 2 of the displayed requests are pending: an account access issue and a technical support request. I recommend reviewing the oldest pending request first.";
+        response =
+          "The dashboard shows 12 pending requests overall. In the recent requests list, 2 of the displayed requests are pending: an account access issue and a technical support request. I recommend reviewing the oldest pending request first.";
       } else if (
         lowerMessage.includes("metric") ||
         lowerMessage.includes("explain")
@@ -132,6 +133,367 @@ function App() {
     setError(false);
   };
 
+  const renderDashboard = () => (
+    <>
+      <section className="welcome">
+        <div>
+          <h1>Good morning, Omoh</h1>
+          <p>
+            Here's what's happening with your service operations today.
+          </p>
+        </div>
+
+        <button
+          className="assistant-button"
+          onClick={() => setAssistantOpen(true)}
+        >
+          ✦ Ask AI
+        </button>
+      </section>
+
+      <section className="metrics">
+        <div className="metric-card">
+          <div className="metric-top">
+            <span className="metric-label">Total Requests</span>
+            <div className="metric-icon">▤</div>
+          </div>
+
+          <div className="metric-value">248</div>
+          <div className="metric-change positive">
+            ↑ 12.5% this month
+          </div>
+        </div>
+
+        <div className="metric-card">
+          <div className="metric-top">
+            <span className="metric-label">Pending</span>
+            <div className="metric-icon">◷</div>
+          </div>
+
+          <div className="metric-value">12</div>
+          <div className="metric-change warning">
+            Needs attention
+          </div>
+        </div>
+
+        <div className="metric-card">
+          <div className="metric-top">
+            <span className="metric-label">Resolved</span>
+            <div className="metric-icon">✓</div>
+          </div>
+
+          <div className="metric-value">186</div>
+          <div className="metric-change positive">
+            ↑ 8.2% this month
+          </div>
+        </div>
+
+        <div className="metric-card">
+          <div className="metric-top">
+            <span className="metric-label">Avg. Response</span>
+            <div className="metric-icon">◴</div>
+          </div>
+
+          <div className="metric-value">2h 14m</div>
+          <div className="metric-change positive">
+            ↓ 18 min improvement
+          </div>
+        </div>
+      </section>
+
+      <section className="content-grid">
+        <div className="card requests-card">
+          <div className="card-header">
+            <div className="card-title">Recent Requests</div>
+            <button
+              className="card-link"
+              onClick={() => setActivePage("Requests")}
+            >
+              View all
+            </button>
+          </div>
+
+          <div className="request-list">
+            {requests.map((request) => (
+              <div className="request-row" key={request.id}>
+                <div className="request-main">
+                  <div className="request-id">{request.id}</div>
+                  <div className="request-title">
+                    {request.title}
+                  </div>
+                  <div className="request-meta">
+                    {request.customer}
+                  </div>
+                </div>
+
+                <div className="request-right">
+                  <span
+                    className={`status ${request.status
+                      .toLowerCase()
+                      .replace(" ", "-")}`}
+                  >
+                    {request.status}
+                  </span>
+
+                  <span className="request-time">
+                    {request.time}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="card activity-card">
+          <div className="card-header">
+            <div className="card-title">Recent Activity</div>
+            <button
+              className="card-link"
+              onClick={() => setActivePage("Activity")}
+            >
+              View all
+            </button>
+          </div>
+
+          <div className="activity-list">
+            {activities.map((activity, index) => (
+              <div className="activity-item" key={index}>
+                <div className="activity-dot"></div>
+
+                <div>
+                  <div className="activity-text">
+                    {activity.text}
+                  </div>
+
+                  <div className="activity-time">
+                    {activity.time}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    </>
+  );
+
+  const renderRequests = () => (
+    <section>
+      <div className="welcome">
+        <div>
+          <h1>Requests</h1>
+          <p>Manage and monitor customer service requests.</p>
+        </div>
+
+        <button
+          className="assistant-button"
+          onClick={() => setAssistantOpen(true)}
+        >
+          ✦ Ask AI
+        </button>
+      </div>
+
+      <div className="card">
+        <div className="card-header">
+          <div className="card-title">All Requests</div>
+          <span className="metric-label">248 total</span>
+        </div>
+
+        <div className="request-list">
+          {requests.map((request) => (
+            <div className="request-row" key={request.id}>
+              <div className="request-main">
+                <div className="request-id">{request.id}</div>
+                <div className="request-title">
+                  {request.title}
+                </div>
+                <div className="request-meta">
+                  {request.customer}
+                </div>
+              </div>
+
+              <div className="request-right">
+                <span
+                  className={`status ${request.status
+                    .toLowerCase()
+                    .replace(" ", "-")}`}
+                >
+                  {request.status}
+                </span>
+
+                <span className="request-time">
+                  {request.time}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+
+  const renderActivity = () => (
+    <section>
+      <div className="welcome">
+        <div>
+          <h1>Activity</h1>
+          <p>Keep track of recent service operations.</p>
+        </div>
+
+        <button
+          className="assistant-button"
+          onClick={() => setAssistantOpen(true)}
+        >
+          ✦ Ask AI
+        </button>
+      </div>
+
+      <div className="card">
+        <div className="card-header">
+          <div className="card-title">Recent Activity</div>
+        </div>
+
+        <div className="activity-list">
+          {activities.map((activity, index) => (
+            <div className="activity-item" key={index}>
+              <div className="activity-dot"></div>
+
+              <div>
+                <div className="activity-text">
+                  {activity.text}
+                </div>
+
+                <div className="activity-time">
+                  {activity.time}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+
+  const renderAnalytics = () => (
+    <section>
+      <div className="welcome">
+        <div>
+          <h1>Analytics</h1>
+          <p>Monitor your service operation performance.</p>
+        </div>
+
+        <button
+          className="assistant-button"
+          onClick={() => setAssistantOpen(true)}
+        >
+          ✦ Ask AI
+        </button>
+      </div>
+
+      <section className="metrics">
+        <div className="metric-card">
+          <div className="metric-label">Total Requests</div>
+          <div className="metric-value">248</div>
+          <div className="metric-change positive">
+            ↑ 12.5% this month
+          </div>
+        </div>
+
+        <div className="metric-card">
+          <div className="metric-label">Resolution Rate</div>
+          <div className="metric-value">75%</div>
+          <div className="metric-change positive">
+            ↑ 8.2% this month
+          </div>
+        </div>
+
+        <div className="metric-card">
+          <div className="metric-label">Pending Requests</div>
+          <div className="metric-value">12</div>
+          <div className="metric-change warning">
+            Needs attention
+          </div>
+        </div>
+
+        <div className="metric-card">
+          <div className="metric-label">Avg. Response</div>
+          <div className="metric-value">2h 14m</div>
+          <div className="metric-change positive">
+            ↓ 18 min improvement
+          </div>
+        </div>
+      </section>
+
+      <div className="card">
+        <div className="card-header">
+          <div className="card-title">Performance Overview</div>
+        </div>
+
+        <p>
+          Service performance is trending positively, with faster
+          response times and an increase in resolved requests this
+          month.
+        </p>
+      </div>
+    </section>
+  );
+
+  const renderSettings = () => (
+    <section>
+      <div className="welcome">
+        <div>
+          <h1>Settings</h1>
+          <p>Manage your OpsFlow workspace preferences.</p>
+        </div>
+      </div>
+
+      <div className="card">
+        <div className="card-header">
+          <div className="card-title">Workspace Settings</div>
+        </div>
+
+        <div className="activity-list">
+          <div className="activity-item">
+            <div className="activity-dot"></div>
+            <div>
+              <div className="activity-text">
+                Notifications
+              </div>
+              <div className="activity-time">
+                Manage dashboard and request notifications.
+              </div>
+            </div>
+          </div>
+
+          <div className="activity-item">
+            <div className="activity-dot"></div>
+            <div>
+              <div className="activity-text">
+                AI Assistant
+              </div>
+              <div className="activity-time">
+                Configure how the assistant works with dashboard
+                data.
+              </div>
+            </div>
+          </div>
+
+          <div className="activity-item">
+            <div className="activity-dot"></div>
+            <div>
+              <div className="activity-text">
+                Account Preferences
+              </div>
+              <div className="activity-time">
+                Manage your profile and workspace preferences.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+
   return (
     <div className="app">
       {/* SIDEBAR */}
@@ -142,27 +504,52 @@ function App() {
         </div>
 
         <nav className="nav">
-          <button className="nav-item active">
+          <button
+            className={`nav-item ${
+              activePage === "Dashboard" ? "active" : ""
+            }`}
+            onClick={() => setActivePage("Dashboard")}
+          >
             <span>▦</span>
             <span>Dashboard</span>
           </button>
 
-          <button className="nav-item">
+          <button
+            className={`nav-item ${
+              activePage === "Requests" ? "active" : ""
+            }`}
+            onClick={() => setActivePage("Requests")}
+          >
             <span>▤</span>
             <span>Requests</span>
           </button>
 
-          <button className="nav-item">
+          <button
+            className={`nav-item ${
+              activePage === "Activity" ? "active" : ""
+            }`}
+            onClick={() => setActivePage("Activity")}
+          >
             <span>◷</span>
             <span>Activity</span>
           </button>
 
-          <button className="nav-item">
+          <button
+            className={`nav-item ${
+              activePage === "Analytics" ? "active" : ""
+            }`}
+            onClick={() => setActivePage("Analytics")}
+          >
             <span>◩</span>
             <span>Analytics</span>
           </button>
 
-          <button className="nav-item">
+          <button
+            className={`nav-item ${
+              activePage === "Settings" ? "active" : ""
+            }`}
+            onClick={() => setActivePage("Settings")}
+          >
             <span>⚙</span>
             <span>Settings</span>
           </button>
@@ -192,124 +579,11 @@ function App() {
           </div>
         </header>
 
-        {/* WELCOME */}
-        <section className="welcome">
-          <div>
-            <h1>Good morning, Omoh</h1>
-            <p>Here's what's happening with your service operations today.</p>
-          </div>
-
-          <button
-            className="assistant-button"
-            onClick={() => setAssistantOpen(true)}
-          >
-            ✦ Ask AI
-          </button>
-        </section>
-
-        {/* METRICS */}
-        <section className="metrics">
-          <div className="metric-card">
-            <div className="metric-top">
-              <span className="metric-label">Total Requests</span>
-              <div className="metric-icon">▤</div>
-            </div>
-
-            <div className="metric-value">248</div>
-            <div className="metric-change positive">↑ 12.5% this month</div>
-          </div>
-
-          <div className="metric-card">
-            <div className="metric-top">
-              <span className="metric-label">Pending</span>
-              <div className="metric-icon">◷</div>
-            </div>
-
-            <div className="metric-value">12</div>
-            <div className="metric-change warning">Needs attention</div>
-          </div>
-
-          <div className="metric-card">
-            <div className="metric-top">
-              <span className="metric-label">Resolved</span>
-              <div className="metric-icon">✓</div>
-            </div>
-
-            <div className="metric-value">186</div>
-            <div className="metric-change positive">↑ 8.2% this month</div>
-          </div>
-
-          <div className="metric-card">
-            <div className="metric-top">
-              <span className="metric-label">Avg. Response</span>
-              <div className="metric-icon">◴</div>
-            </div>
-
-            <div className="metric-value">2h 14m</div>
-            <div className="metric-change positive">↓ 18 min improvement</div>
-          </div>
-        </section>
-
-        {/* CONTENT */}
-        <section className="content-grid">
-          {/* REQUESTS */}
-          <div className="card requests-card">
-            <div className="card-header">
-              <div className="card-title">Recent Requests</div>
-              <button className="card-link">View all</button>
-            </div>
-
-            <div className="request-list">
-              {requests.map((request) => (
-                <div className="request-row" key={request.id}>
-                  <div className="request-main">
-                    <div className="request-id">{request.id}</div>
-                    <div className="request-title">{request.title}</div>
-                    <div className="request-meta">{request.customer}</div>
-                  </div>
-
-                  <div className="request-right">
-                    <span
-                      className={`status ${request.status
-                        .toLowerCase()
-                        .replace(" ", "-")}`}
-                    >
-                      {request.status}
-                    </span>
-
-                    <span className="request-time">{request.time}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* ACTIVITY */}
-          <div className="card activity-card">
-            <div className="card-header">
-              <div className="card-title">Recent Activity</div>
-              <button className="card-link">View all</button>
-            </div>
-
-            <div className="activity-list">
-              {activities.map((activity, index) => (
-                <div className="activity-item" key={index}>
-                  <div className="activity-dot"></div>
-
-                  <div>
-                    <div className="activity-text">
-                      {activity.text}
-                    </div>
-
-                    <div className="activity-time">
-                      {activity.time}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
+        {activePage === "Dashboard" && renderDashboard()}
+        {activePage === "Requests" && renderRequests()}
+        {activePage === "Activity" && renderActivity()}
+        {activePage === "Analytics" && renderAnalytics()}
+        {activePage === "Settings" && renderSettings()}
       </main>
 
       {/* AI ASSISTANT */}
@@ -414,7 +688,8 @@ function App() {
 
                 {error && (
                   <div className="error-message">
-                    Something went wrong while processing your request.
+                    Something went wrong while processing your
+                    request.
                     <br />
 
                     <button onClick={handleRetry}>
@@ -442,7 +717,7 @@ function App() {
 
               <button
                 className="send-button"
-                onClick={handleSend}
+                onClick={() => handleSend()}
                 disabled={!message.trim() || loading}
               >
                 ↑
